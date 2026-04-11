@@ -1,6 +1,7 @@
 ID|Name|Password|Role
 DIR001|Amin|1234|Director
 ADM001|Sara|abcd|Admin
-DOC001|Ali|docpass|Doctor
-NUR001|Lina|nurse1|Nurse
-PAT001|John|pat123|Patient
+PAT000001|Fathima|abcd|Patient
+DOC000001|Ali|abcd|Doctor
+NUR000001|Sarah|abcd|Nurse
+PAT000002|Amina|abcd|Patient
