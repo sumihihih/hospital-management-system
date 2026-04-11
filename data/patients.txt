@@ -1,0 +1,3 @@
+PatientID|Name|Age|Gender|Contact
+PAT001|Jacob|25|Male|0123456789
+PAT002|Aina|30|Female|0198765432

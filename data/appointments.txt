@@ -1,0 +1,3 @@
+AppointmentID|PatientID|DoctorID|Date|Time|Status
+AP001|PAT001|DOC001|2026-04-15|10:00|Scheduled
+AP002|PAT002|DOC002|2026-04-15|10:00|Scheduled

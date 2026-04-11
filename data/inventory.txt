@@ -1,0 +1,3 @@
+ItemID|ItemName|Category|StockLevel
+I001|Paracetamol|Medication|100
+I002|Syringe|Equipment|50

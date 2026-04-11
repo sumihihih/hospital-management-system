@@ -1,0 +1,3 @@
+DoctorID|Name|Department|Specialization
+DOC001|Ali|Cardiology|Heart Specialist
+DOC002|Farah|Dermatology|Skin Specialist
