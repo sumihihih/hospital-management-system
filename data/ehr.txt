@@ -1,3 +1,3 @@
 RecordID|PatientID|DoctorID|Diagnosis|Prescription|Notes
-E001|PAT001|DOC001|Flu|Paracetamol|Rest well
-E002|PAT002|DOC002|Skin Rash|Cream|Apply twice daily
+E001|PAT000001|DOC000001|Flu|Paracetamol|Rest well
+E002|PAT000002|DOC000002|Skin Rash|Cream|Apply twice daily
