@@ -20,3 +20,4 @@ PAT000006|Kayle|abcd|Patient
 DOC000009|Emma|abcd|Doctor
 DOC000010|Elwis|abcd|Doctor
 DOC000011|keekee|abcd|Doctor
+NUR000003|Haleema|abcdef|Nurse
