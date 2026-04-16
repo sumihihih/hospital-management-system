@@ -2,5 +2,6 @@
 #define DIRECTOR_H
 
 void directorMenu();
+void viewAppointmentTrends();
 
 #endif
