@@ -117,7 +117,7 @@ void addInventory()
     FILE *fptr;
     struct Inventory inv;
 
-    fptr = fopen("inventory.txt", "a");
+    fptr = fopen("../inventory.txt", "a");
 
     if (fptr == NULL)
     {
