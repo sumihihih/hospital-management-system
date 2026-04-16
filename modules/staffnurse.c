@@ -155,7 +155,7 @@ void viewInventory()
     struct Inventory inv;
 
     // FIX: variable renamed consistently to 'file'; corrected path to ../inventory.txt
-    FILE *file = fopen("data/inventory.txt", "r");
+    FILE *file = fopen("../data/inventory.txt", "r");
 
     if (file == NULL)
     {
@@ -189,7 +189,7 @@ void searchInventory()
     int found = 0;
 
     // FIX: consistent variable name 'file'; corrected path
-    FILE *file = fopen("data/inventory.txt", "r");
+    FILE *file = fopen("../data/inventory.txt", "r");
 
     if (file == NULL)
     {
@@ -234,8 +234,8 @@ void editInventory()
     int newQty, found = 0;
 
     // FIX: consistent variable name 'file'; corrected path
-    FILE *file = fopen("data/inventory.txt", "r");
-    FILE *temp = fopen("data/temp.txt", "w");
+    FILE *file = fopen("../data/inventory.txt", "r");
+    FILE *temp = fopen("../data/temp.txt", "w");
 
     if (file == NULL)
     {
@@ -275,8 +275,8 @@ void editInventory()
     fclose(file);
     fclose(temp);
 
-    remove("data/inventory.txt");
-    rename("data/temp.txt", "data/inventory.txt");
+    remove("../data/inventory.txt");
+    rename("../data/temp.txt", "../data/inventory.txt");
 
     if (found)
         printf("Inventory updated.\n");
@@ -291,8 +291,8 @@ void deleteInventory()
     char name[MAX_NAME];
     int found = 0;
 
-    FILE *fptr = fopen("data/inventory.txt", "r");
-    FILE *temp = fopen("data/temp.txt", "w");
+    FILE *fptr = fopen("../data/inventory.txt", "r");
+    FILE *temp = fopen("../data/temp.txt", "w");
 
     if (fptr == NULL)
     {
@@ -327,8 +327,8 @@ void deleteInventory()
     fclose(fptr);
     fclose(temp);
 
-    remove("../inventory.txt");
-    rename("../temp.txt", "../inventory.txt");
+    remove("../data/inventory.txt");
+    rename("../data/temp.txt", "../data/inventory.txt");
 
     if (found)
         printf("Item deleted successfully.\n");
