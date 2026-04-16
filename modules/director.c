@@ -115,7 +115,6 @@ void viewAdministrators()
 
 
 void viewAppointmentTrends() {
-    // Note: Ensure your file is actually named "appoinments.txt" in the data folder
     FILE *fp = fopen("data/appointments.txt", "r");
     if (fp == NULL) {
         printf("\n[!] Error: Cannot find 'data/appointments.txt'\n");
