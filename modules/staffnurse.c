@@ -2,17 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../headers/nurse.h"
+#include "../headers/structures.h"
 
 #define MAX_NAME 50
 
-/* Structures */
-struct Inventory
-{
-    char ItemID[10];
-    char ItemName[40];
-    char Category[30];
-    int quantity;
-};
+// structures already defined in structures.h so removed from here
 
 /* Function Prototypes */
 void nurseMenu(void);
@@ -23,69 +17,67 @@ void searchInventory(void);
 void editInventory(void);
 void deleteInventory(void);
 
-int main()
+void nurseMenu(void)
 {
     int choice;
 
     do
     {
-        nurseMenu();
-        printf("Enter choice: ");
+        printf("\n=====================================\n");
+        printf("          STAFF NURSE MENU           \n");
+        printf("=====================================\n");
+        printf("1. View Doctor Schedule\n");
+        printf("2. Add Inventory\n");
+        printf("3. View Inventory\n");
+        printf("4. Search Inventory\n");
+        printf("5. Edit Inventory\n");
+        printf("6. Delete Inventory\n");
+        printf("0. Logout\n");
+        printf("Enter your choice: ");
 
         if (scanf("%d", &choice) != 1)
         {
-            printf("Invalid input. Enter a number.\n");
-            while (getchar() != '\n')
-                ;
+            printf("Invalid input. Please enter a number.\n");
+            while (getchar() != '\n');
             continue;
         }
 
-        switch (choice)
+        while (getchar() != '\n');
+
+        if (choice == 1)
         {
-        case 1:
             viewDoctorSchedule();
-            break;
-        case 2:
+        }
+        else if (choice == 2)
+        {
             addInventory();
-            break;
-        case 3:
+        }
+        else if (choice == 3)
+        {
             viewInventory();
-            break;
-        case 4:
+        }
+        else if (choice == 4)
+        {
             searchInventory();
-            break;
-        case 5:
+        }
+        else if (choice == 5)
+        {
             editInventory();
-            break;
-        case 6:
+        }
+        else if (choice == 6)
+        {
             deleteInventory();
-            break;
-        case 7:
+        }
+        else if (choice == 0)
+        {
             printf("Logging out...\n");
-            break;
-        default:
-            printf("Invalid option.\n");
+        }
+        else
+        {
+            printf("Invalid choice. Please try again.\n");
         }
 
-    } while (choice != 7);
-
-    return 0;
-}
-
-/* Menu */
-void nurseMenu()
-{
-    printf("\n============================\n");
-    printf("     STAFF NURSE MENU       \n");
-    printf("============================\n");
-    printf("1. View Doctor Schedule\n");
-    printf("2. Add Inventory\n");
-    printf("3. View Inventory\n");
-    printf("4. Search Inventory\n");
-    printf("5. Edit Inventory\n");
-    printf("6. Delete Inventory\n");
-    printf("7. Exit\n");
-    printf("============================\n");
+    } while (choice != 0);
 }
 
 /* View Doctor Schedule */
@@ -100,7 +92,9 @@ void viewDoctorSchedule()
     }
 
     char line[200];
-    printf("---------Doctor Schedule---------\n");
+    printf("\n=====================================\n");
+    printf("          DOCTOR SCHEDULE            \n");
+    printf("=====================================\n");
 
     while (fgets(line, sizeof(line), file))
     {
@@ -111,212 +105,232 @@ void viewDoctorSchedule()
 }
 
 /* Add Inventory */
-void addInventory()
+void addInventory(void)
 {
-    struct Inventory inv;
+    FILE *file;
+    Inventory inv;
 
-    // FIX: removed duplicate FILE *file declaration
-    FILE *file = fopen("data/inventory.txt", "a");
+    file = fopen("data/inventory.txt", "a");
 
     if (file == NULL)
     {
-        printf("Error opening file.\n");
+        printf("Error opening inventory file.\n");
         return;
     }
 
-    printf("Enter item ID: ");
-    scanf("%s", inv.ItemID);
+    printf("\n=====================================\n");
+    printf("            ADD INVENTORY            \n");
+    printf("=====================================\n");
 
-    printf("Enter item Name: ");
-    scanf("%s", inv.ItemName); // FIX: removed incorrect & (array already decays to pointer)
+    printf("Enter Item ID: ");
+    scanf("%9s", inv.item_id);
+
+    printf("Enter Item Name: ");
+    scanf(" %49[^\n]", inv.item_name);
 
     printf("Enter Category: ");
-    scanf("%s", inv.Category); // FIX: removed incorrect &
+    scanf(" %29[^\n]", inv.category);
 
     printf("Enter Stock Level: ");
-    scanf("%d", &inv.quantity);
+    scanf("%d", &inv.stock_level);
 
-    if (inv.quantity < 0)
+    if (inv.stock_level < 0)
     {
-        printf("Invalid quantity.\n");
-        fclose(file); // FIX: close file before returning
+        printf("Invalid stock level.\n");
+        fclose(file);
         return;
     }
 
-    // FIX: write in pipe-delimited format to match inventory.txt
-    fprintf(file, "%s|%s|%s|%d\n", inv.ItemID, inv.ItemName, inv.Category, inv.quantity);
+    fprintf(file, "\n%s|%s|%s|%d",
+            inv.item_id, inv.item_name, inv.category, inv.stock_level);
+
     fclose(file);
-    printf("Item added successfully!\n");
-} // FIX: added missing closing brace
+
+    printf("Inventory added successfully!\n");
+}
 
 /* View Inventory */
-void viewInventory()
+void viewInventory(void)
 {
-    struct Inventory inv;
+    FILE *file;
+    Inventory inv;
 
-    // FIX: variable renamed consistently to 'file'; corrected path to ../inventory.txt
-    FILE *file = fopen("../data/inventory.txt", "r");
+    file = fopen("data/inventory.txt", "r");
 
     if (file == NULL)
     {
-        printf("No inventory found.\n");
+        printf("Error opening inventory file.\n");
         return;
     }
 
-    // Skip header line
-    char header[200];
-    fgets(header, sizeof(header), file);
+    printf("\n=====================================\n");
+    printf("            VIEW INVENTORY           \n");
+    printf("=====================================\n");
+    printf("%-10s %-20s %-15s %-10s\n",
+           "ItemID", "ItemName", "Category", "Stock");
+    printf("------------------------------------------------------------\n");
 
-    printf("\n%-10s %-20s %-15s %-10s\n", "ItemID", "ItemName", "Category", "StockLevel");
-    printf("----------------------------------------------------------\n");
+    /* skip header line */
+    fscanf(file, "%*[^\n]\n");
 
-    // FIX: fscanf now uses pipe-delimited format matching inventory.txt
-    while (fscanf(file, " %9[^|]|%39[^|]|%29[^|]|%d",
-                  inv.ItemID, inv.ItemName, inv.Category, &inv.quantity) == 4)
+    while (fscanf(file, " %9[^|]|%49[^|]|%29[^|]|%d",
+                  inv.item_id, inv.item_name, inv.category, &inv.stock_level) == 4)
     {
         printf("%-10s %-20s %-15s %-10d\n",
-               inv.ItemID, inv.ItemName, inv.Category, inv.quantity);
+               inv.item_id, inv.item_name, inv.category, inv.stock_level);
     }
 
     fclose(file);
 }
 
+
 /* Search Inventory */
-void searchInventory()
+void searchInventory(void)
 {
-    struct Inventory inv;
-    char name[MAX_NAME];
+    FILE *file;
+    Inventory inv;
+    char search[50];
     int found = 0;
 
-    // FIX: consistent variable name 'file'; corrected path
-    FILE *file = fopen("../data/inventory.txt", "r");
+    file = fopen("data/inventory.txt", "r");
 
     if (file == NULL)
     {
-        printf("No inventory found.\n");
+        printf("Error opening inventory file.\n");
         return;
     }
 
-    // Skip header line
-    char header[200];
-    fgets(header, sizeof(header), file);
+    printf("\n=====================================\n");
+    printf("           SEARCH INVENTORY          \n");
+    printf("=====================================\n");
+    printf("Enter Item ID or Item Name: ");
+    scanf(" %49[^\n]", search);
 
-    printf("Enter item name to search: ");
-    scanf("%s", name);
+    /* skip header line */
+    fscanf(file, "%*[^\n]\n");
 
-    // FIX: fscanf uses pipe-delimited format
-    while (fscanf(file, " %9[^|]|%39[^|]|%29[^|]|%d",
-                  inv.ItemID, inv.ItemName, inv.Category, &inv.quantity) == 4)
+    while (fscanf(file, " %9[^|]|%49[^|]|%29[^|]|%d",
+                  inv.item_id, inv.item_name, inv.category, &inv.stock_level) == 4)
     {
-        if (strcmp(inv.ItemName, name) == 0)
+        if (strcmp(search, inv.item_id) == 0 || strcmp(search, inv.item_name) == 0)
         {
             printf("\nItem Found:\n");
-            printf("  ID       : %s\n", inv.ItemID);
-            printf("  Name     : %s\n", inv.ItemName);
-            printf("  Category : %s\n", inv.Category);
-            printf("  Stock    : %d\n", inv.quantity);
+            printf("Item ID     : %s\n", inv.item_id);
+            printf("Item Name   : %s\n", inv.item_name);
+            printf("Category    : %s\n", inv.category);
+            printf("Stock Level : %d\n", inv.stock_level);
             found = 1;
         }
     }
 
     if (!found)
+    {
         printf("Item not found.\n");
+    }
 
-    // FIX: was fclose(fptr) — variable is 'file'
     fclose(file);
 }
 
+
 /* Edit Inventory */
-void editInventory()
+void editInventory(void)
 {
-    struct Inventory inv;
-    char name[MAX_NAME];
+    FILE *file, *temp;
+    Inventory inv;
+    char searchName[50];
     int newQty, found = 0;
+    char header[200];
 
-    // FIX: consistent variable name 'file'; corrected path
-    FILE *file = fopen("../data/inventory.txt", "r");
-    FILE *temp = fopen("../data/temp.txt", "w");
+    file = fopen("data/inventory.txt", "r");
+    temp = fopen("data/temp.txt", "w");
 
-    if (file == NULL)
+    if (file == NULL || temp == NULL)
     {
-        printf("No inventory file.\n");
-        if (temp != NULL)
-            fclose(temp);
+        printf("Error opening inventory file.\n");
+        if (file != NULL) fclose(file);
+        if (temp != NULL) fclose(temp);
         return;
     }
 
-    // Copy header line to temp file
-    char header[200];
-    if (fgets(header, sizeof(header), file))
+    /* copy header */
+    if (fgets(header, sizeof(header), file) != NULL)
+    {
         fputs(header, temp);
+    }
 
     printf("Enter item name to edit: ");
-    scanf("%s", name);
+    scanf(" %49[^\n]", searchName);
 
-    // FIX: fscanf and fprintf use pipe-delimited format
-    while (fscanf(file, " %9[^|]|%39[^|]|%29[^|]|%d",
-                  inv.ItemID, inv.ItemName, inv.Category, &inv.quantity) == 4)
+    while (fscanf(file, " %9[^|]|%49[^|]|%29[^|]|%d",
+                  inv.item_id, inv.item_name, inv.category, &inv.stock_level) == 4)
     {
-        if (strcmp(inv.ItemName, name) == 0)
+        if (strcmp(inv.item_name, searchName) == 0)
         {
-            printf("Current stock: %d\n", inv.quantity);
-            printf("Enter new quantity: ");
+            printf("Current stock: %d\n", inv.stock_level);
+            printf("Enter new stock level: ");
             scanf("%d", &newQty);
-            fprintf(temp, "%s|%s|%s|%d\n", inv.ItemID, inv.ItemName, inv.Category, newQty);
+
+            fprintf(temp, "%s|%s|%s|%d\n",
+                    inv.item_id, inv.item_name, inv.category, newQty);
             found = 1;
         }
         else
         {
-            fprintf(temp, "%s|%s|%s|%d\n", inv.ItemID, inv.ItemName, inv.Category, inv.quantity);
+            fprintf(temp, "%s|%s|%s|%d\n",
+                    inv.item_id, inv.item_name, inv.category, inv.stock_level);
         }
     }
 
-    // FIX: was fclose(fptr) — variable is 'file'
     fclose(file);
     fclose(temp);
 
-    remove("../data/inventory.txt");
-    rename("../data/temp.txt", "../data/inventory.txt");
+    remove("data/inventory.txt");
+    rename("data/temp.txt", "data/inventory.txt");
 
     if (found)
-        printf("Inventory updated.\n");
+        printf("Inventory updated successfully!\n");
     else
         printf("Item not found.\n");
 }
 
-/* Delete Inventory */
-void deleteInventory()
+
+// delete inventory
+
+void deleteInventory(void)
 {
-    struct Inventory inv;
-    char name[MAX_NAME];
+    FILE *file, *temp;
+    Inventory inv;
+    char searchName[50];
     int found = 0;
+    char header[200];
 
-    FILE *fptr = fopen("../data/inventory.txt", "r");
-    FILE *temp = fopen("../data/temp.txt", "w");
+    file = fopen("data/inventory.txt", "r");
+    temp = fopen("data/temp.txt", "w");
 
-    if (fptr == NULL)
+    if (file == NULL || temp == NULL)
     {
-        printf("No inventory file.\n");
-        if (temp != NULL)
-            fclose(temp);
+        printf("Error opening inventory file.\n");
+        if (file != NULL) fclose(file);
+        if (temp != NULL) fclose(temp);
         return;
     }
 
-    // Copy header line to temp file
-    char header[200];
-    if (fgets(header, sizeof(header), fptr))
+    /* copy header */
+    if (fgets(header, sizeof(header), file) != NULL)
+    {
         fputs(header, temp);
+    }
 
     printf("Enter item name to delete: ");
-    scanf("%s", name);
+    scanf(" %49[^\n]", searchName);
 
-    // FIX: fscanf and fprintf use pipe-delimited format; reads all 4 fields
-    while (fscanf(fptr, " %9[^|]|%39[^|]|%29[^|]|%d",
-                  inv.ItemID, inv.ItemName, inv.Category, &inv.quantity) == 4)
+    while (fscanf(file, " %9[^|]|%49[^|]|%29[^|]|%d",
+                  inv.item_id, inv.item_name, inv.category, &inv.stock_level) == 4)
     {
-        if (strcmp(inv.ItemName, name) != 0)
+        if (strcmp(inv.item_name, searchName) != 0)
         {
-            fprintf(temp, "%s|%s|%s|%d\n", inv.ItemID, inv.ItemName, inv.Category, inv.quantity);
+            fprintf(temp, "%s|%s|%s|%d\n",
+                    inv.item_id, inv.item_name, inv.category, inv.stock_level);
         }
         else
         {
@@ -324,14 +338,14 @@ void deleteInventory()
         }
     }
 
-    fclose(fptr);
+    fclose(file);
     fclose(temp);
 
-    remove("../data/inventory.txt");
-    rename("../data/temp.txt", "../data/inventory.txt");
+    remove("data/inventory.txt");
+    rename("data/temp.txt", "data/inventory.txt");
 
     if (found)
-        printf("Item deleted successfully.\n");
+        printf("Item deleted successfully!\n");
     else
         printf("Item not found.\n");
 }
