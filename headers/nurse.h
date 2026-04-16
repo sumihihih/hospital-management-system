@@ -6,5 +6,7 @@ void viewDoctorSchedule(void);
 void addInventory(void);
 void viewInventory(void);
 void searchInventory(void);
+void editInventory(void);
+void deleteInventory(void);
 
 #endif

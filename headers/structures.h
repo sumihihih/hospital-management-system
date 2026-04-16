@@ -1,7 +1,7 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-// ================= USER (LOGIN) =================
+// ================= USER LOGIN 
 typedef struct {
     char id[15];
     char name[50];
@@ -11,14 +11,14 @@ typedef struct {
 } User;
 
 
-// ================= ADMIN =================
+// ================= ADMIN
 typedef struct {
     char admin_id[15];
     char name[50];
 } Admin;
 
 
-// ================= PATIENT =================
+// ================= PATIENT 
 typedef struct {
     char patient_id[15];
     char name[50];
@@ -28,7 +28,7 @@ typedef struct {
 } Patient;
 
 
-// ================= DOCTOR =================
+// ================= DOCTOR
 typedef struct {
     char doctor_id[15];
     char name[50];
@@ -37,7 +37,7 @@ typedef struct {
 } Doctor;
 
 
-// ================= NURSE =================
+// ================= NURSE 
 typedef struct {
     char nurse_id[15];
     char name[50];
@@ -45,7 +45,7 @@ typedef struct {
 } Nurse;
 
 
-// ================= APPOINTMENT =================
+// ================= APPOINTMENT 
 typedef struct {
     char appointment_id[10];
     char patient_id[15];
@@ -56,7 +56,7 @@ typedef struct {
 } Appointment;
 
 
-// ================= BILLING =================
+// ================= BILLING
 typedef struct {
     char bill_id[10];
     char appointment_id[10];
@@ -66,7 +66,7 @@ typedef struct {
 } Billing;
 
 
-// ================= EHR =================
+// ================= EHR 
 typedef struct {
     char record_id[10];
     char patient_id[15];
@@ -77,7 +77,7 @@ typedef struct {
 } EHR;
 
 
-// ================= INVENTORY =================
+// ================= INVENTORY 
 typedef struct {
     char item_id[10];
     char item_name[50];
@@ -86,7 +86,7 @@ typedef struct {
 } Inventory;
 
 
-// ================= SCHEDULE =================
+// ================= SCHEDULE 
 typedef struct {
     char doctor_id[15];
     char date[11];
