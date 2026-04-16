@@ -38,11 +38,13 @@ void nurseMenu(void)
         if (scanf("%d", &choice) != 1)
         {
             printf("Invalid input. Please enter a number.\n");
-            while (getchar() != '\n');
+            while (getchar() != '\n')
+                ;
             continue;
         }
 
-        while (getchar() != '\n');
+        while (getchar() != '\n')
+            ;
 
         if (choice == 1)
         {
@@ -183,7 +185,6 @@ void viewInventory(void)
     fclose(file);
 }
 
-
 /* Search Inventory */
 void searchInventory(void)
 {
@@ -231,7 +232,6 @@ void searchInventory(void)
     fclose(file);
 }
 
-
 /* Edit Inventory */
 void editInventory(void)
 {
@@ -247,8 +247,10 @@ void editInventory(void)
     if (file == NULL || temp == NULL)
     {
         printf("Error opening inventory file.\n");
-        if (file != NULL) fclose(file);
-        if (temp != NULL) fclose(temp);
+        if (file != NULL)
+            fclose(file);
+        if (temp != NULL)
+            fclose(temp);
         return;
     }
 
@@ -293,7 +295,6 @@ void editInventory(void)
         printf("Item not found.\n");
 }
 
-
 // delete inventory
 
 void deleteInventory(void)
@@ -310,8 +311,10 @@ void deleteInventory(void)
     if (file == NULL || temp == NULL)
     {
         printf("Error opening inventory file.\n");
-        if (file != NULL) fclose(file);
-        if (temp != NULL) fclose(temp);
+        if (file != NULL)
+            fclose(file);
+        if (temp != NULL)
+            fclose(temp);
         return;
     }
 
