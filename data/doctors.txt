@@ -1,5 +1,18 @@
 DoctorID|Name|Department|Specialization
 DOC001|Ali|Cardiology|Heart Specialist
 DOC002|Farah|Dermatology|Skin Specialist
+DOC003|Aleem|Neurology|Brain Specialist
+DOC004|Afeef|Orthopedics|Bone Specialist
+DOC005|Aliya|Pediatrics|Child Specialist
+DOC006|Ahmed|Emergency|Emergency Care
+DOC007|Emma|General|General Physician
+DOC008|Elwis|Cardiology|Cardiac Surgeon
+DOC009|Keekee|Neurology|Neurosurgeon
+DOC010|Sara|Orthopedics|Joint Specialist
+DOC011|Haziq|Pediatrics|Neonatal Specialist
 DOC012|Ali|Cardiology|Cardiac Surgeon
 DOC013|Ahmed|General|Internal Medicine Specialist
+DOC014|Mira|Emergency|Trauma Specialist
+DOC015|Danish|General|General Physician
+
+DOC016|Ayisha|Orthopedics|Joint Specialist

@@ -277,10 +277,11 @@ void filterPatientsMenu(char currentUserName[])
         printf("=====================================\n");
         printf("1. Filter by Gender\n");
         printf("2. Filter by Age Range\n");
+        printf("3. Filter by Name\n");
         printf("0. Go Back\n");
         printf("Enter your choice: ");
 
-        choice = readMenuChoice(0, 2);
+        choice = readMenuChoice(0, 3);
 
         if (choice == 1)
         {
@@ -289,6 +290,10 @@ void filterPatientsMenu(char currentUserName[])
         else if (choice == 2)
         {
             filterByAgeRange(currentUserName);
+        }
+        else if (choice == 3)
+        {
+            filterByName(currentUserName);
         }
         else
         {
@@ -395,34 +400,11 @@ void filterByAgeRange(char currentUserName[])
 /// Shows the patient search menu.
 void searchPatient(char currentUserName[])
 {
-    int choice;
+    printf("\n=====================================\n");
+    printf("           SEARCH PATIENT            \n");
+    printf("=====================================\n");
 
-    while (1)
-    {
-        printf("\n=====================================\n");
-        printf("           SEARCH PATIENT            \n");
-        printf("=====================================\n");
-        printf("1. Search by Patient ID\n");
-        printf("2. Search by Patient Name\n");
-        printf("0. Go Back\n");
-        printf("Enter your choice: ");
-
-        choice = readMenuChoice(0, 2);
-
-        if (choice == 1)
-        {
-            searchPatientByID(currentUserName);
-        }
-        else if (choice == 2)
-        {
-            searchPatientByName(currentUserName);
-        }
-        else
-        {
-            printf("Going back...\n");
-            return;
-        }
-    }
+    searchPatientByID(currentUserName);
 }
 
 /// Searches for a patient by patient ID.
@@ -516,6 +498,55 @@ void searchPatientByName(char currentUserName[])
     waitForEnter();
 }
 
+/// Filters patients by patient name and prints the report.
+void filterByName(char currentUserName[])
+{
+    FILE *file = openPatientFile();
+    Patient patient;
+    char searchName[50];
+    char patientNameLower[50];
+    char dateTime[50];
+    int found = 0;
+
+    if (file == NULL)
+    {
+        return;
+    }
+
+    printf("Enter Patient Name: ");
+    scanf(" %49[^\n]", searchName);
+    while (getchar() != '\n');
+
+    toLowerCase(searchName);
+    skipHeaderLine(file);
+
+    getCurrentDateTime(dateTime);
+    printPatientReportHeader("        FILTERED PATIENT REPORT      ", currentUserName, dateTime);
+    printf("Filtered By Name: %s\n", searchName);
+    printPatientTableHeader();
+
+    while (readPatient(file, &patient))
+    {
+        strcpy(patientNameLower, patient.name);
+        toLowerCase(patientNameLower);
+
+        if (strcmp(searchName, patientNameLower) == 0)
+        {
+            printPatientRow(patient);
+            found = 1;
+        }
+    }
+
+    fclose(file);
+
+    if (found == 0)
+    {
+        printf("No matching patient found.\n");
+    }
+
+    waitForEnter();
+}
+
 /// Shows all patients in report format.
 void viewPatients(char currentUserName[])
 {
@@ -580,7 +611,6 @@ void adminMenu(char currentUserName[])
         }
     }
 }
-
 
 
 

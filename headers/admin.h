@@ -13,5 +13,6 @@ void searchPatientByName(char currentUserName[]);
 void filterPatientsMenu(char currentUserName[]);
 void filterByGender(char currentUserName[]);
 void filterByAgeRange(char currentUserName[]);
+void filterByName(char currentUserName[]);
 
 #endif

@@ -116,7 +116,7 @@ void rescheduleAppointment(char currentPatientID[]) {
             } else {
                 printf("Enter New Date (YYYY-MM-DD): "); scanf("%s", nDate);
                 printf("Enter New Time (HH:MM): "); scanf("%s", nTime);
-                fprintf(ft, "%s|%s|%s|%s|%s|Rescheduled\n", appointment_id, patient_id, doctor_id, nDate, nTime);
+                fprintf(ft, "%s|%s|%s|%s|%s|Reschedule\n", appointment_id, patient_id, doctor_id, nDate, nTime);
                 found = 1;
             }
         } else {

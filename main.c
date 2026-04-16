@@ -8,6 +8,7 @@
 #include "headers/nurse.h"
 #include "headers/helper.h" 
 #include "headers/doctor.h"
+#include "headers/patient.h"
 
 int chooseRole(char selectedRole[]) {
     int roleChoice;
@@ -66,7 +67,7 @@ void openRoleMenu(char role[], char userId[], char userName[]) {
         doctorMenu(userId, userName);
     }
     else if (strcmp(role, "Patient") == 0) {
-        printf("Patient menu coming soon...\n");
+        patientMenu(userId);
     }
     else if (strcmp(role, "Nurse") == 0) {
         nurseMenu();

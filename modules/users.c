@@ -233,6 +233,35 @@ int confirmDeactivateUser(void)
     }
 }
 
+//// Asks the admin to confirm the password reset action.
+int confirmResetPassword(void)
+{
+    int choice;
+
+    while (1)
+    {
+        printf("\n1. Confirm Reset Password\n");
+        printf("0. Cancel\n");
+        printf("Enter your choice: ");
+
+        if (scanf("%d", &choice) != 1)
+        {
+            printf("Invalid input. Please enter 1 or 0.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+
+        while (getchar() != '\n');
+
+        if (choice == 1 || choice == 0)
+        {
+            return choice;
+        }
+
+        printf("Invalid choice. Please enter 1 or 0.\n");
+    }
+}
+
 //// Lets the admin choose a department for doctor or nurse users.
 int chooseDepartment(char department[], const char lastDepartment[])
 {
@@ -359,8 +388,9 @@ void savePatientDetails(User user)
 {
     FILE *detailFile;
     Patient patient;
+    long fileSize;
 
-    detailFile = fopen("data/patients.txt", "a");
+    detailFile = fopen("data/patients.txt", "a+");
 
     if (detailFile == NULL)
     {
@@ -380,7 +410,20 @@ void savePatientDetails(User user)
     printf("Enter Contact: ");
     scanf(" %19[^\n]", patient.contact);
 
-    fprintf(detailFile, "\n%s|%s|%d|%s|%s",
+    fseek(detailFile, 0, SEEK_END);
+    fileSize = ftell(detailFile);
+
+    if (fileSize > 0)
+    {
+        fseek(detailFile, -1, SEEK_END);
+
+        if (fgetc(detailFile) != '\n')
+        {
+            fputc('\n', detailFile);
+        }
+    }
+
+    fprintf(detailFile, "%s|%s|%d|%s|%s",
             patient.patient_id, patient.name,
             patient.age, patient.gender, patient.contact);
 
@@ -494,7 +537,6 @@ void resetUserPassword(void)
 {
     User user;
     char userID[15];
-    char newPassword[20];
 
     while (1)
     {
@@ -526,13 +568,21 @@ void resetUserPassword(void)
             return;
         }
 
-        printf("Enter New Password: ");
-        scanf(" %19[^\n]", newPassword);
-        while (getchar() != '\n');
+        if (strcmp(user.status, "Deactivated") == 0)
+        {
+            printf("Password cannot be reset for a deactivated account.\n");
+            return;
+        }
 
-        if (updateUserFile(userID, newPassword, 2))
+        if (confirmResetPassword() == 0)
+        {
+            return;
+        }
+
+        if (updateUserFile(userID, "Reset123", 2))
         {
             printf("User password reset successfully!\n");
+            printf("Temporary password is: Reset123\n");
         }
         else
         {
@@ -588,7 +638,7 @@ void printUsersByRole(char title[], char role1[], char role2[])
     }
 
     printf("\n%s\n", title);
-    printf("%-12s %-20s\n", "UserID", "Name");
+    printf("%-12s %-20s %-12s\n", "UserID", "Name", "Status");
     fscanf(file, "%*[^\n]\n");
 
     while (readUser(file, &user))
@@ -596,7 +646,7 @@ void printUsersByRole(char title[], char role1[], char role2[])
         if (strcmp(user.role, role1) == 0 ||
             (role2[0] != '\0' && strcmp(user.role, role2) == 0))
         {
-            printf("%-12s %-20s\n", user.id, user.name);
+            printf("%-12s %-20s %-12s\n", user.id, user.name, user.status);
         }
     }
 

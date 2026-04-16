@@ -8,6 +8,7 @@ void searchInventory(void);
 void searchInventoryByID(void);
 void searchInventoryByName(void);
 void filterInventory(char currentUserName[]);
+void filterInventoryByName(char currentUserName[]);
 void filterInventoryByCategory(char currentUserName[]);
 void filterInventoryByStockLevel(char currentUserName[]);
 int chooseInventoryCategory(char category[]);

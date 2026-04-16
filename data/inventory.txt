@@ -11,3 +11,7 @@ I009|Wheelchair|Equipment|2
 I010|IV Stand|Equipment|25
 I011|Thermometer|Equipment|0
 I012|ECG Machine|Equipment|140
+I013|Stethoscope|Equipment|35
+I014|Bandages|Supplies|80
+I015|Cough Syrup|Medication|22
+I016|Amoxicillin|Medication|0

@@ -12,3 +12,5 @@ EHR010|PAT007|DOC003|Migraine|Antiemetics|Take one tablet before meals
 EHR011|PAT008|DOC004|Fracture|Pain Relievers|Apply bandage and take pain relief
 EHR012|PAT009|DOC004|Back Pain|Acetaminophen|Take two tablets every 4-6 hours
 EHR013|PAT006|DOC001|Kidney Stone|Paracetamol|Take twice a day
+EHR014|PAT010|DOC012|Diabetes|Metformin|Monitor sugar level daily
+EHR015|PAT011|DOC013|Fever|Ibuprofen|Drink plenty of water
