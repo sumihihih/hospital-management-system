@@ -1,8 +1,17 @@
 #ifndef ADMIN_H
 #define ADMIN_H
 
-void adminMenu();
-void registerUser();
-int generateNextNumber(char prefix[]);
+void adminMenu(char currentUserName[]);
+
+void patientReportMenu(char currentUserName[]);
+void viewPatients(char currentUserName[]);
+
+void searchPatient(char currentUserName[]);
+void searchPatientByID(char currentUserName[]);
+void searchPatientByName(char currentUserName[]);
+
+void filterPatientsMenu(char currentUserName[]);
+void filterByGender(char currentUserName[]);
+void filterByAgeRange(char currentUserName[]);
 
 #endif

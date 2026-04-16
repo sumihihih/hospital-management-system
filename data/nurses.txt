@@ -1,3 +1,4 @@
 NurseID|Name|Department
-NUR000002|Haleema|Respiratory
-NUR000003|Haleema|Emergency
+NUR002|Haleema|Respiratory
+NUR003|Haleema|Emergency
+NUR004|Suma|Cardiology

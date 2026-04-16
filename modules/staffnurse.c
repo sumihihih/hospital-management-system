@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../headers/nurse.h"
 #include "../headers/structures.h"
+#include "../headers/inventory.h"
 
 #define MAX_NAME 50
 
@@ -16,6 +17,7 @@ void viewInventory(void);
 void searchInventory(void);
 void editInventory(void);
 void deleteInventory(void);
+void chooseInventoryItemName(int categoryChoice, char itemName[]);
 
 void nurseMenu(void)
 {
@@ -38,13 +40,11 @@ void nurseMenu(void)
         if (scanf("%d", &choice) != 1)
         {
             printf("Invalid input. Please enter a number.\n");
-            while (getchar() != '\n')
-                ;
+            while (getchar() != '\n');
             continue;
         }
 
-        while (getchar() != '\n')
-            ;
+        while (getchar() != '\n');
 
         if (choice == 1)
         {
@@ -106,11 +106,94 @@ void viewDoctorSchedule()
     fclose(file);
 }
 
+void chooseInventoryItemName(int categoryChoice, char itemName[])
+{
+    int itemChoice;
+
+    while (1)
+    {
+        printf("\nChoose Item Name:\n");
+
+        if (categoryChoice == 1)
+        {
+            printf("1. Paracetamol\n");
+            printf("2. Amoxicillin\n");
+            printf("3. Ibuprofen\n");
+            printf("4. Metformin\n");
+        }
+        else if (categoryChoice == 2)
+        {
+            printf("1. Syringes\n");
+            printf("2. Gloves\n");
+            printf("3. Gauze\n");
+            printf("4. Masks\n");
+        }
+        else
+        {
+            printf("1. Wheelchair\n");
+            printf("2. IV Stand\n");
+            printf("3. Thermometer\n");
+            printf("4. ECG Machine\n");
+        }
+
+        printf("Enter choice: ");
+
+        if (scanf("%d", &itemChoice) != 1)
+        {
+            printf("Invalid input. Please enter a value from 1 to 4.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+
+        while (getchar() != '\n');
+
+        if (categoryChoice == 1)
+        {
+            if (itemChoice == 1) strcpy(itemName, "Paracetamol");
+            else if (itemChoice == 2) strcpy(itemName, "Amoxicillin");
+            else if (itemChoice == 3) strcpy(itemName, "Ibuprofen");
+            else if (itemChoice == 4) strcpy(itemName, "Metformin");
+            else
+            {
+                printf("Invalid choice. Please try again.\n");
+                continue;
+            }
+        }
+        else if (categoryChoice == 2)
+        {
+            if (itemChoice == 1) strcpy(itemName, "Syringes");
+            else if (itemChoice == 2) strcpy(itemName, "Gloves");
+            else if (itemChoice == 3) strcpy(itemName, "Gauze");
+            else if (itemChoice == 4) strcpy(itemName, "Masks");
+            else
+            {
+                printf("Invalid choice. Please try again.\n");
+                continue;
+            }
+        }
+        else
+        {
+            if (itemChoice == 1) strcpy(itemName, "Wheelchair");
+            else if (itemChoice == 2) strcpy(itemName, "IV Stand");
+            else if (itemChoice == 3) strcpy(itemName, "Thermometer");
+            else if (itemChoice == 4) strcpy(itemName, "ECG Machine");
+            else
+            {
+                printf("Invalid choice. Please try again.\n");
+                continue;
+            }
+        }
+
+        return;
+    }
+}
+
 /* Add Inventory */
 void addInventory(void)
 {
     FILE *file;
     Inventory inv;
+    int categoryChoice;
 
     file = fopen("data/inventory.txt", "a");
 
@@ -126,15 +209,21 @@ void addInventory(void)
 
     printf("Enter Item ID: ");
     scanf("%9s", inv.item_id);
+    while (getchar() != '\n');
 
-    printf("Enter Item Name: ");
-    scanf(" %49[^\n]", inv.item_name);
-
-    printf("Enter Category: ");
-    scanf(" %29[^\n]", inv.category);
+    categoryChoice = chooseInventoryCategory(inv.category);
+    chooseInventoryItemName(categoryChoice, inv.item_name);
 
     printf("Enter Stock Level: ");
-    scanf("%d", &inv.stock_level);
+    if (scanf("%d", &inv.stock_level) != 1)
+    {
+        printf("Invalid stock level.\n");
+        while (getchar() != '\n');
+        fclose(file);
+        return;
+    }
+
+    while (getchar() != '\n');
 
     if (inv.stock_level < 0)
     {
@@ -151,86 +240,11 @@ void addInventory(void)
     printf("Inventory added successfully!\n");
 }
 
-/* View Inventory */
-void viewInventory(void)
-{
-    FILE *file;
-    Inventory inv;
 
-    file = fopen("data/inventory.txt", "r");
 
-    if (file == NULL)
-    {
-        printf("Error opening inventory file.\n");
-        return;
-    }
 
-    printf("\n=====================================\n");
-    printf("            VIEW INVENTORY           \n");
-    printf("=====================================\n");
-    printf("%-10s %-20s %-15s %-10s\n",
-           "ItemID", "ItemName", "Category", "Stock");
-    printf("------------------------------------------------------------\n");
 
-    /* skip header line */
-    fscanf(file, "%*[^\n]\n");
 
-    while (fscanf(file, " %9[^|]|%49[^|]|%29[^|]|%d",
-                  inv.item_id, inv.item_name, inv.category, &inv.stock_level) == 4)
-    {
-        printf("%-10s %-20s %-15s %-10d\n",
-               inv.item_id, inv.item_name, inv.category, inv.stock_level);
-    }
-
-    fclose(file);
-}
-
-/* Search Inventory */
-void searchInventory(void)
-{
-    FILE *file;
-    Inventory inv;
-    char search[50];
-    int found = 0;
-
-    file = fopen("data/inventory.txt", "r");
-
-    if (file == NULL)
-    {
-        printf("Error opening inventory file.\n");
-        return;
-    }
-
-    printf("\n=====================================\n");
-    printf("           SEARCH INVENTORY          \n");
-    printf("=====================================\n");
-    printf("Enter Item ID or Item Name: ");
-    scanf(" %49[^\n]", search);
-
-    /* skip header line */
-    fscanf(file, "%*[^\n]\n");
-
-    while (fscanf(file, " %9[^|]|%49[^|]|%29[^|]|%d",
-                  inv.item_id, inv.item_name, inv.category, &inv.stock_level) == 4)
-    {
-        if (strcmp(search, inv.item_id) == 0 || strcmp(search, inv.item_name) == 0)
-        {
-            printf("\nItem Found:\n");
-            printf("Item ID     : %s\n", inv.item_id);
-            printf("Item Name   : %s\n", inv.item_name);
-            printf("Category    : %s\n", inv.category);
-            printf("Stock Level : %d\n", inv.stock_level);
-            found = 1;
-        }
-    }
-
-    if (!found)
-    {
-        printf("Item not found.\n");
-    }
-
-    fclose(file);
-}
 
 /* Edit Inventory */
 void editInventory(void)
@@ -247,10 +261,8 @@ void editInventory(void)
     if (file == NULL || temp == NULL)
     {
         printf("Error opening inventory file.\n");
-        if (file != NULL)
-            fclose(file);
-        if (temp != NULL)
-            fclose(temp);
+        if (file != NULL) fclose(file);
+        if (temp != NULL) fclose(temp);
         return;
     }
 
@@ -295,6 +307,7 @@ void editInventory(void)
         printf("Item not found.\n");
 }
 
+
 // delete inventory
 
 void deleteInventory(void)
@@ -311,10 +324,8 @@ void deleteInventory(void)
     if (file == NULL || temp == NULL)
     {
         printf("Error opening inventory file.\n");
-        if (file != NULL)
-            fclose(file);
-        if (temp != NULL)
-            fclose(temp);
+        if (file != NULL) fclose(file);
+        if (temp != NULL) fclose(temp);
         return;
     }
 

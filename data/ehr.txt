@@ -1,3 +1,14 @@
 RecordID|PatientID|DoctorID|Diagnosis|Prescription|Notes
-E001|PAT000001|DOC000001|Flu|Paracetamol|Rest well
-E002|PAT000002|DOC000002|Skin Rash|Cream|Apply twice daily
+EHR001|PAT001|DOC001|Flu|Paracetamol|Rest well
+EHR002|PAT002|DOC002|Skin Rash|Cream|Apply twice daily
+EHR003|PAT001|DOC001|Sick|Eat Medicine|Eat Medicine
+EHR004|PAT001|DOC001|Heart Attack|Aspirin|Take one tablet daily
+EHR005|PAT002|DOC001|High Blood Pressure|Lisinopril|Take one tablet daily
+EHR006|PAT003|DOC001|Asthma|Albuterol|Use inhaler as needed
+EHR007|PAT004|DOC002|Skin Rash|Cream|Apply twice daily
+EHR008|PAT005|DOC002|Eczema|Hydrocortisone Cream|Apply as needed
+EHR009|PAT006|DOC003|Headache|Painkiller|Take one tablet daily
+EHR010|PAT007|DOC003|Migraine|Antiemetics|Take one tablet before meals
+EHR011|PAT008|DOC004|Fracture|Pain Relievers|Apply bandage and take pain relief
+EHR012|PAT009|DOC004|Back Pain|Acetaminophen|Take two tablets every 4-6 hours
+EHR013|PAT006|DOC001|Kidney Stone|Paracetamol|Take twice a day

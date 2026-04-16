@@ -1,3 +1,13 @@
 ItemID|ItemName|Category|StockLevel
 I001|Paracetamol|Medication|100
-I002|Syringe|Equipment|50
+I002|Syringes|Supplies|15
+I003|Amoxicillin|Medication|0
+I004|Ibuprofen|Medication|18
+I005|Metformin|Medication|135
+I006|Gloves|Supplies|60
+I007|Gauze|Supplies|150
+I008|Masks|Supplies|0
+I009|Wheelchair|Equipment|2
+I010|IV Stand|Equipment|25
+I011|Thermometer|Equipment|0
+I012|ECG Machine|Equipment|140

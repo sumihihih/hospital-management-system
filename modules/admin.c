@@ -1,299 +1,588 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+#include <time.h>
 #include "../headers/admin.h"
+#include "../headers/users.h"
 #include "../headers/structures.h"
+#include "../headers/inventory.h"
+#include "../headers/helper.h"
 
+static void getCurrentDateTime(char dateTime[]);
+static FILE *openPatientFile(void);
+static void skipHeaderLine(FILE *file);
+static int readPatient(FILE *file, Patient *patient);
+static void printPatientTableHeader(void);
+static void printPatientRow(Patient patient);
+static void printPatientDetails(Patient patient);
+static void printPatientReportHeader(char title[], char currentUserName[], char dateTime[]);
+static void waitForEnter(void);
+static int readMenuChoice(int min, int max);
+static int chooseGenderFilter(char selectedGender[]);
+static int chooseAgeRange(char ageLabel[], int *minAge, int *maxAge);
 
-void registerUser() {
-    FILE *userFile;
-    FILE *detailFile;
-    User user;
-    Patient patient;
-    Doctor doctor;
-    Nurse nurse;
-    int roleChoice;
-    int nextNum;
-    char prefix[4];
+/// Gets the current date and time for reports.
+static void getCurrentDateTime(char dateTime[])
+{
+    time_t t = time(NULL);
+    struct tm *currentTime = localtime(&t);
 
-    printf("\n=====================================");
-    printf("\n            REGISTER NEW USER        ");
-    printf("\n=====================================\n");
-
-    //ROLE CHOICE WITH RETRY
-    while (1) {
-        printf("Choose user type:\n");
-        printf("1. Patient\n");
-        printf("2. Doctor\n");
-        printf("3. Nurse\n");
-        printf("0. Go Back\n");
-        printf("Enter choice: ");
-        scanf("%d", &roleChoice);
-
-        if (roleChoice == 0) {
-            printf("Going back...\n");
-            return;  // goes back to admin menu
-        }
-
-        if (roleChoice >= 1 && roleChoice <= 3) break;
-
-        printf("Invalid choice. Please try again.\n");
-    }
-
-    // assign role + prefix
-    if (roleChoice == 1) {
-        strcpy(user.role, "Patient");
-        strcpy(prefix, "PAT");
-    }
-    else if (roleChoice == 2) {
-        strcpy(user.role, "Doctor");
-        strcpy(prefix, "DOC");
-    }
-    else {
-        strcpy(user.role, "Nurse");
-        strcpy(prefix, "NUR");
-    }
-
-    nextNum = generateNextNumber(prefix);
-    sprintf(user.id, "%s%06d", prefix, nextNum);
-
-    printf("Generated ID: %s\n", user.id);
-
-    printf("Enter Name: ");
-    scanf(" %49[^\n]", user.name);
-
-    printf("Enter Password: ");
-    scanf(" %19[^\n]", user.password);
-
-    //WRITE TO USERS FILE
-    userFile = fopen("data/users.txt", "a");
-    if (userFile == NULL) {
-        printf("Error opening users file.\n");
-        return;
-    }
-
-    fprintf(userFile, "\n%s|%s|%s|%s",
-            user.id, user.name, user.password, user.role);
-
-    fclose(userFile);
-
-    // =============================
-    // 👤 PATIENT
-    // =============================
-    if (roleChoice == 1) {
-        detailFile = fopen("data/patients.txt", "a");
-
-        if (detailFile == NULL) {
-            printf("Error opening patients file.\n");
-            return;
-        }
-
-        strcpy(patient.patient_id, user.id);
-        strcpy(patient.name, user.name);
-
-        printf("Enter Age: ");
-        scanf("%d", &patient.age);
-        while (getchar() != '\n');
-
-        printf("Enter Gender: ");
-        scanf(" %9[^\n]", patient.gender);
-
-        printf("Enter Contact: ");
-        scanf(" %19[^\n]", patient.contact);
-
-        fprintf(detailFile, "\n%s|%s|%d|%s|%s",
-                patient.patient_id, patient.name,
-                patient.age, patient.gender, patient.contact);
-
-        fclose(detailFile);
-    }
-
-    // =============================
-    // DOCTOR
-    // =============================
-    else if (roleChoice == 2) {
-        int deptChoice, specChoice;
-
-        detailFile = fopen("data/doctors.txt", "a");
-
-        if (detailFile == NULL) {
-            printf("Error opening doctors file.\n");
-            return;
-        }
-
-        strcpy(doctor.doctor_id, user.id);
-        strcpy(doctor.name, user.name);
-
-        // DEPARTMENT WITH RETRY
-        while (1) {
-            printf("Choose Department:\n");
-            printf("1. Cardiology\n");
-            printf("2. Neurology\n");
-            printf("3. Orthopedics\n");
-            printf("4. Pediatrics\n");
-            printf("5. Emergency\n");
-            printf("6. General Medicine\n");
-            printf("Enter choice: ");
-            scanf("%d", &deptChoice);
-
-            if (deptChoice >= 1 && deptChoice <= 6) break;
-
-            printf("Invalid choice. Please try again.\n");
-        }
-
-        // SPECIALIZATION DEPENDS ON DEPARTMENT
-        while (1) {
-            if (deptChoice == 1) {
-                strcpy(doctor.department, "Cardiology");
-                printf("1. Heart Specialist\n2. Cardiac Surgeon\n");
-            }
-            else if (deptChoice == 2) {
-                strcpy(doctor.department, "Neurology");
-                printf("1. Brain Specialist\n2. Neurosurgeon\n");
-            }
-            else if (deptChoice == 3) {
-                strcpy(doctor.department, "Orthopedics");
-                printf("1. Bone Specialist\n2. Joint Specialist\n");
-            }
-            else if (deptChoice == 4) {
-                strcpy(doctor.department, "Pediatrics");
-                printf("1. Child Specialist\n2. Neonatal Specialist\n");
-            }
-            else if (deptChoice == 5) {
-                strcpy(doctor.department, "Emergency");
-                printf("1. Emergency Care\n2. Trauma Specialist\n");
-            }
-            else {
-                strcpy(doctor.department, "General Medicine");
-                printf("1. General Physician\n2. Internal Medicine Specialist\n");
-            }
-
-            printf("Enter specialization choice: ");
-            scanf("%d", &specChoice);
-
-            if (specChoice == 1 || specChoice == 2) break;
-
-            printf("Invalid choice. Please try again.\n");
-        }
-
-        // assign specialization
-        if (deptChoice == 1) {
-            if (specChoice == 1) strcpy(doctor.specialization, "Heart Specialist");
-            else strcpy(doctor.specialization, "Cardiac Surgeon");
-        }
-        else if (deptChoice == 2) {
-            if (specChoice == 1) strcpy(doctor.specialization, "Brain Specialist");
-            else strcpy(doctor.specialization, "Neurosurgeon");
-        }
-        else if (deptChoice == 3) {
-            if (specChoice == 1) strcpy(doctor.specialization, "Bone Specialist");
-            else strcpy(doctor.specialization, "Joint Specialist");
-        }
-        else if (deptChoice == 4) {
-            if (specChoice == 1) strcpy(doctor.specialization, "Child Specialist");
-            else strcpy(doctor.specialization, "Neonatal Specialist");
-        }
-        else if (deptChoice == 5) {
-            if (specChoice == 1) strcpy(doctor.specialization, "Emergency Care");
-            else strcpy(doctor.specialization, "Trauma Specialist");
-        }
-        else {
-            if (specChoice == 1) strcpy(doctor.specialization, "General Physician");
-            else strcpy(doctor.specialization, "Internal Medicine Specialist");
-        }
-
-        fprintf(detailFile, "\n%s|%s|%s|%s",
-                doctor.doctor_id, doctor.name,
-                doctor.department, doctor.specialization);
-
-        fclose(detailFile);
-    }
-
-    // =============================
-    // NURSE
-    // =============================
-    else {
-        int deptChoice;
-
-        detailFile = fopen("data/nurses.txt", "a");
-
-        if (detailFile == NULL) {
-            printf("Error opening nurses file.\n");
-            return;
-        }
-
-        strcpy(nurse.nurse_id, user.id);
-        strcpy(nurse.name, user.name);
-
-        while (1) {
-            printf("Choose Department:\n");
-            printf("1. Cardiology\n");
-            printf("2. Neurology\n");
-            printf("3. Orthopedics\n");
-            printf("4. Pediatrics\n");
-            printf("5. Emergency\n");
-            printf("6. General Ward\n");
-            printf("Enter choice: ");
-            scanf("%d", &deptChoice);
-
-            if (deptChoice >= 1 && deptChoice <= 6) break;
-
-            printf("Invalid choice. Please try again.\n");
-        }
-
-        if (deptChoice == 1) strcpy(nurse.department, "Cardiology");
-        else if (deptChoice == 2) strcpy(nurse.department, "Neurology");
-        else if (deptChoice == 3) strcpy(nurse.department, "Orthopedics");
-        else if (deptChoice == 4) strcpy(nurse.department, "Pediatrics");
-        else if (deptChoice == 5) strcpy(nurse.department, "Emergency");
-        else strcpy(nurse.department, "General Ward");
-
-        fprintf(detailFile, "\n%s|%s|%s",
-                nurse.nurse_id, nurse.name, nurse.department);
-
-        fclose(detailFile);
-    }
-
-    printf("\n%s registered successfully!\n", user.role);
+    strftime(dateTime, 50, "%Y-%m-%d %H:%M:%S", currentTime);
 }
 
+/// Opens the patient file and shows an error if it cannot open.
+static FILE *openPatientFile(void)
+{
+    FILE *file = fopen("data/patients.txt", "r");
 
-void adminMenu() {
+    if (file == NULL)
+    {
+        printf("Error opening patients file.\n");
+    }
+
+    return file;
+}
+
+/// Skips the first line of a text file.
+static void skipHeaderLine(FILE *file)
+{
+    fscanf(file, "%*[^\n]\n");
+}
+
+/// Reads one patient record from the file.
+static int readPatient(FILE *file, Patient *patient)
+{
+    return fscanf(file, " %14[^|]|%49[^|]|%d|%9[^|]|%19[^\n]\n",
+                  patient->patient_id,
+                  patient->name,
+                  &patient->age,
+                  patient->gender,
+                  patient->contact) == 5;
+}
+
+/// Prints the patient table heading used in reports.
+static void printPatientTableHeader(void)
+{
+    printf("--------------------------------------------------------------\n");
+    printf("%-12s %-15s %-5s %-10s %-15s\n",
+           "PatientID", "Name", "Age", "Gender", "Contact");
+    printf("--------------------------------------------------------------\n");
+}
+
+/// Prints one patient in table format.
+static void printPatientRow(Patient patient)
+{
+    printf("%-12s %-15s %-5d %-10s %-15s\n",
+           patient.patient_id,
+           patient.name,
+           patient.age,
+           patient.gender,
+           patient.contact);
+}
+
+/// Prints one patient's details in a simple list format.
+static void printPatientDetails(Patient patient)
+{
+    printf("Patient ID : %s\n", patient.patient_id);
+    printf("Name       : %s\n", patient.name);
+    printf("Age        : %d\n", patient.age);
+    printf("Gender     : %s\n", patient.gender);
+    printf("Contact    : %s\n", patient.contact);
+}
+
+/// Prints the common header for patient reports.
+static void printPatientReportHeader(char title[], char currentUserName[], char dateTime[])
+{
+    printf("\n=====================================\n");
+    printf("%s\n", title);
+    printf("=====================================\n");
+    printf("Report generated by %s at %s\n", currentUserName, dateTime);
+}
+
+/// Waits for the user to press Enter.
+static void waitForEnter(void)
+{
+    printf("\nPress Enter to go back...");
+    getchar();
+}
+
+/// Reads a menu choice and keeps asking until it is valid.
+static int readMenuChoice(int min, int max)
+{
     int choice;
 
-    while (1) {
-        printf("\n=====================================");
-        printf("\n              ADMIN MENU             ");
-        printf("\n=====================================\n");
-        printf("1. Register new user\n");
-        printf("2. View patients\n");
-        printf("3. View inventory\n");
-        printf("0. Go Back\n");
-        printf("Enter your choice: ");
-
-        if (scanf("%d", &choice) != 1) {
-            printf("Invalid input. Please enter 1-4.\n");
+    while (1)
+    {
+        if (scanf("%d", &choice) != 1)
+        {
+            printf("Invalid input. Please enter %d-%d.\n", min, max);
             while (getchar() != '\n');
+            printf("Enter your choice: ");
             continue;
         }
 
         while (getchar() != '\n');
 
-        if (choice == 1) {
-            registerUser();
+        if (choice >= min && choice <= max)
+        {
+            return choice;
         }
-        else if (choice == 2) {
-            printf("View patients feature coming soon...\n");
+
+        printf("Invalid input. Please enter %d-%d.\n", min, max);
+        printf("Enter your choice: ");
+    }
+}
+
+/// Lets the admin choose a gender filter.
+static int chooseGenderFilter(char selectedGender[])
+{
+    int choice;
+
+    while (1)
+    {
+        printf("\n=====================================\n");
+        printf("         FILTER BY GENDER            \n");
+        printf("=====================================\n");
+        printf("1. Female\n");
+        printf("2. Male\n");
+        printf("0. Go Back\n");
+        printf("Enter your choice: ");
+
+        choice = readMenuChoice(0, 2);
+
+        if (choice == 0)
+        {
+            return 0;
         }
-        else if (choice == 3) {
-            printf("View inventory feature coming soon...\n");
+
+        if (choice == 1)
+        {
+            strcpy(selectedGender, "Female");
         }
-        else if (choice == 0) {
-        printf("Going back...\n");
-        break;  // THIS RETURNS TO PREVIOUS MENU
+        else
+        {
+            strcpy(selectedGender, "Male");
         }
-        else {
-            printf("Invalid choice. Please enter 1-4.\n");
+
+        return 1;
+    }
+}
+
+/// Lets the admin choose an age range filter.
+static int chooseAgeRange(char ageLabel[], int *minAge, int *maxAge)
+{
+    int choice;
+
+    while (1)
+    {
+        printf("\n=====================================\n");
+        printf("        FILTER BY AGE RANGE          \n");
+        printf("=====================================\n");
+        printf("1. Children (0 - 12)\n");
+        printf("2. Teenagers (13 - 19)\n");
+        printf("3. Young Adult (20 - 35)\n");
+        printf("4. Adult (36 - 64)\n");
+        printf("5. Senior (65+)\n");
+        printf("0. Go Back\n");
+        printf("Enter your choice: ");
+
+        choice = readMenuChoice(0, 5);
+
+        if (choice == 0)
+        {
+            return 0;
+        }
+
+        if (choice == 1)
+        {
+            *minAge = 0;
+            *maxAge = 12;
+            strcpy(ageLabel, "Children");
+        }
+        else if (choice == 2)
+        {
+            *minAge = 13;
+            *maxAge = 19;
+            strcpy(ageLabel, "Teenagers");
+        }
+        else if (choice == 3)
+        {
+            *minAge = 20;
+            *maxAge = 35;
+            strcpy(ageLabel, "Young Adult");
+        }
+        else if (choice == 4)
+        {
+            *minAge = 36;
+            *maxAge = 64;
+            strcpy(ageLabel, "Adult");
+        }
+        else
+        {
+            *minAge = 65;
+            *maxAge = 200;
+            strcpy(ageLabel, "Senior");
+        }
+
+        return 1;
+    }
+}
+
+/// Shows the patient report menu.
+void patientReportMenu(char currentUserName[])
+{
+    int choice;
+
+    while (1)
+    {
+        printf("\n=====================================\n");
+        printf("            PATIENT REPORT           \n");
+        printf("=====================================\n");
+        printf("1. View Patient Report\n");
+        printf("2. Search Patient\n");
+        printf("3. Filter Patient\n");
+        printf("0. Go Back\n");
+        printf("Enter your choice: ");
+
+        choice = readMenuChoice(0, 3);
+
+        if (choice == 1)
+        {
+            viewPatients(currentUserName);
+        }
+        else if (choice == 2)
+        {
+            searchPatient(currentUserName);
+        }
+        else if (choice == 3)
+        {
+            filterPatientsMenu(currentUserName);
+        }
+        else
+        {
+            printf("Going back...\n");
+            return;
         }
     }
 }
+
+/// Shows the patient filter menu.
+void filterPatientsMenu(char currentUserName[])
+{
+    int choice;
+
+    while (1)
+    {
+        printf("\n=====================================\n");
+        printf("           FILTER PATIENTS           \n");
+        printf("=====================================\n");
+        printf("1. Filter by Gender\n");
+        printf("2. Filter by Age Range\n");
+        printf("0. Go Back\n");
+        printf("Enter your choice: ");
+
+        choice = readMenuChoice(0, 2);
+
+        if (choice == 1)
+        {
+            filterByGender(currentUserName);
+        }
+        else if (choice == 2)
+        {
+            filterByAgeRange(currentUserName);
+        }
+        else
+        {
+            printf("Going back...\n");
+            return;
+        }
+    }
+}
+
+/// Filters patients by gender and prints the report.
+void filterByGender(char currentUserName[])
+{
+    FILE *file;
+    Patient patient;
+    char selectedGender[10];
+    char dateTime[50];
+    int found = 0;
+
+    if (!chooseGenderFilter(selectedGender))
+    {
+        return;
+    }
+
+    file = openPatientFile();
+    if (file == NULL)
+    {
+        return;
+    }
+
+    getCurrentDateTime(dateTime);
+    printPatientReportHeader("        FILTERED PATIENT REPORT      ", currentUserName, dateTime);
+    printf("Filtered By Gender: %s\n", selectedGender);
+    printPatientTableHeader();
+
+    skipHeaderLine(file);
+
+    while (readPatient(file, &patient))
+    {
+        if (strcmp(selectedGender, patient.gender) == 0)
+        {
+            printPatientRow(patient);
+            found = 1;
+        }
+    }
+
+    fclose(file);
+
+    if (found == 0)
+    {
+        printf("No matching patient found.\n");
+    }
+
+    waitForEnter();
+}
+
+/// Filters patients by age range and prints the report.
+void filterByAgeRange(char currentUserName[])
+{
+    FILE *file;
+    Patient patient;
+    char ageLabel[20];
+    char dateTime[50];
+    int minAge;
+    int maxAge;
+    int found = 0;
+
+    if (!chooseAgeRange(ageLabel, &minAge, &maxAge))
+    {
+        return;
+    }
+
+    file = openPatientFile();
+    if (file == NULL)
+    {
+        return;
+    }
+
+    getCurrentDateTime(dateTime);
+    printPatientReportHeader("        FILTERED PATIENT REPORT      ", currentUserName, dateTime);
+    printf("Filtered By Age Category: %s\n", ageLabel);
+    printPatientTableHeader();
+
+    skipHeaderLine(file);
+
+    while (readPatient(file, &patient))
+    {
+        if (patient.age >= minAge && patient.age <= maxAge)
+        {
+            printPatientRow(patient);
+            found = 1;
+        }
+    }
+
+    fclose(file);
+
+    if (found == 0)
+    {
+        printf("No matching patient found.\n");
+    }
+
+    waitForEnter();
+}
+
+/// Shows the patient search menu.
+void searchPatient(char currentUserName[])
+{
+    int choice;
+
+    while (1)
+    {
+        printf("\n=====================================\n");
+        printf("           SEARCH PATIENT            \n");
+        printf("=====================================\n");
+        printf("1. Search by Patient ID\n");
+        printf("2. Search by Patient Name\n");
+        printf("0. Go Back\n");
+        printf("Enter your choice: ");
+
+        choice = readMenuChoice(0, 2);
+
+        if (choice == 1)
+        {
+            searchPatientByID(currentUserName);
+        }
+        else if (choice == 2)
+        {
+            searchPatientByName(currentUserName);
+        }
+        else
+        {
+            printf("Going back...\n");
+            return;
+        }
+    }
+}
+
+/// Searches for a patient by patient ID.
+void searchPatientByID(char currentUserName[])
+{
+    FILE *file = openPatientFile();
+    Patient patient;
+    char searchID[15];
+    char dateTime[50];
+    int found = 0;
+
+    if (file == NULL)
+    {
+        return;
+    }
+
+    printf("Enter Patient ID: ");
+    scanf(" %14[^\n]", searchID);
+    while (getchar() != '\n');
+
+    skipHeaderLine(file);
+
+    while (readPatient(file, &patient))
+    {
+        if (strcmp(searchID, patient.patient_id) == 0)
+        {
+            getCurrentDateTime(dateTime);
+            printPatientReportHeader("           PATIENT FOUND             ", currentUserName, dateTime);
+            printf("Search By Patient ID: %s\n", searchID);
+            printf("--------------------------------------------------\n");
+            printPatientDetails(patient);
+            found = 1;
+        }
+    }
+
+    fclose(file);
+
+    if (found == 0)
+    {
+        printf("Patient not found.\n");
+    }
+
+    waitForEnter();
+}
+
+/// Searches for a patient by patient name.
+void searchPatientByName(char currentUserName[])
+{
+    FILE *file = openPatientFile();
+    Patient patient;
+    char searchName[50];
+    char patientNameLower[50];
+    char dateTime[50];
+    int found = 0;
+
+    if (file == NULL)
+    {
+        return;
+    }
+
+    printf("Enter Patient Name: ");
+    scanf(" %49[^\n]", searchName);
+    while (getchar() != '\n');
+
+    toLowerCase(searchName);
+    skipHeaderLine(file);
+
+    while (readPatient(file, &patient))
+    {
+        strcpy(patientNameLower, patient.name);
+        toLowerCase(patientNameLower);
+
+        if (strcmp(searchName, patientNameLower) == 0)
+        {
+            getCurrentDateTime(dateTime);
+            printPatientReportHeader("           PATIENT FOUND             ", currentUserName, dateTime);
+            printf("Search By Patient Name: %s\n", searchName);
+            printf("--------------------------------------------------\n");
+            printPatientDetails(patient);
+            found = 1;
+        }
+    }
+
+    fclose(file);
+
+    if (found == 0)
+    {
+        printf("Patient not found.\n");
+    }
+
+    waitForEnter();
+}
+
+/// Shows all patients in report format.
+void viewPatients(char currentUserName[])
+{
+    FILE *file = openPatientFile();
+    Patient patient;
+    char dateTime[50];
+
+    if (file == NULL)
+    {
+        return;
+    }
+
+    getCurrentDateTime(dateTime);
+    printPatientReportHeader("           PATIENT REPORT            ", currentUserName, dateTime);
+    printPatientTableHeader();
+
+    skipHeaderLine(file);
+
+    while (readPatient(file, &patient))
+    {
+        printPatientRow(patient);
+    }
+
+    fclose(file);
+    waitForEnter();
+}
+
+/// Shows the main admin menu.
+void adminMenu(char currentUserName[])
+{
+    int choice;
+
+    while (1)
+    {
+        printf("\n=====================================\n");
+        printf("              ADMIN MENU             \n");
+        printf("=====================================\n");
+        printf("1. Manage Users\n");
+        printf("2. Manage Patient\n");
+        printf("3. Manage Inventory\n");
+        printf("0. Go Back\n");
+        printf("Enter your choice: ");
+
+        choice = readMenuChoice(0, 3);
+
+        if (choice == 1)
+        {
+            manageUsersMenu(currentUserName);
+        }
+        else if (choice == 2)
+        {
+            patientReportMenu(currentUserName);
+        }
+        else if (choice == 3)
+        {
+            manageInventoryMenu(currentUserName);
+        }
+        else
+        {
+            printf("Going back...\n");
+            return;
+        }
+    }
+}
+
+
+
+
+
+

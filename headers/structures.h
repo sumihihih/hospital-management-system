@@ -7,6 +7,7 @@ typedef struct {
     char name[50];
     char password[20];
     char role[20];
+    char status[20];
 } User;
 
 
