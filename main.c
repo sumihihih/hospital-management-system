@@ -4,6 +4,7 @@
 #include "headers/structures.h"
 #include "headers/auth.h"
 #include "headers/admin.h"
+#include "headers/nurse.h"
 
 //helper function for IDs in registeruser
 int generateNextNumber(char prefix[]) {
@@ -82,7 +83,7 @@ void openRoleMenu(char role[]) {
         printf("Patient menu coming soon...\n");
     }
     else if (strcmp(role, "Nurse") == 0) {
-        printf("Nurse menu coming soon...\n");
+        nurseMenu();
     }
     else if (strcmp(role, "Director") == 0) {
         printf("Director menu coming soon...\n");
