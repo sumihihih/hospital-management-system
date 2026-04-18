@@ -8,7 +8,6 @@ void viewPatients(char currentUserName[]);
 
 void searchPatient(char currentUserName[]);
 void searchPatientByID(char currentUserName[]);
-void searchPatientByName(char currentUserName[]);
 
 void filterPatientsMenu(char currentUserName[]);
 void filterByGender(char currentUserName[]);

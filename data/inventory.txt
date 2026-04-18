@@ -1,5 +1,5 @@
 ItemID|ItemName|Category|StockLevel
-I001|Paracetamol|Medication|100
+I001|Paracetamol|Medication|200
 I002|Syringes|Supplies|15
 I003|Amoxicillin|Medication|0
 I004|Ibuprofen|Medication|18
@@ -15,3 +15,5 @@ I013|Stethoscope|Equipment|35
 I014|Bandages|Supplies|80
 I015|Cough Syrup|Medication|22
 I016|Amoxicillin|Medication|0
+I005|Paracetamol|Medication|65
+I005|Paracetamol|Medication|55

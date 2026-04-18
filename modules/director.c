@@ -444,7 +444,7 @@ void viewAppointmentTrends(void)
     }
 
     int targetMonth;
-    int scheduledCount = 0, rescheduleCount = 0, cancelledCount = 0;
+    int scheduledCount = 0, rescheduleCount = 0, cancelledCount = 0, completedCount = 0;
 
     printf("\n====================================================\n");
     printf("           DIRECTOR: APPOINTMENT ANALYTICS          \n");
@@ -474,6 +474,7 @@ void viewAppointmentTrends(void)
                 if (strcmp(status, "Scheduled") == 0) scheduledCount++;
                 else if (strcmp(status, "Reschedule") == 0) rescheduleCount++;
                 else if (strcmp(status, "Cancelled") == 0) cancelledCount++;
+                else if (strcmp(status, "Completed") == 0) completedCount++;
             }
         }
     }
@@ -484,6 +485,7 @@ void viewAppointmentTrends(void)
     printf("  %-15s : %d\n", "Scheduled", scheduledCount);
     printf("  %-15s : %d\n", "Reschedule", rescheduleCount);
     printf("  %-15s : %d\n", "Cancelled", cancelledCount);
+    printf("  %-15s : %d\n", "Completed", completedCount);
     printf("----------------------------------------------------\n");
     printf("  TOTAL ACTIVITY  : %d\n", (scheduledCount + rescheduleCount + cancelledCount));
     printf("====================================================\n");

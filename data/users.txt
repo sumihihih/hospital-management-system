@@ -62,3 +62,7 @@ NUR014|Harpreet|abcd|Nurse|Active
 NUR015|Maya|abcd|Nurse|Active
 NUR016|Bushra|abcd|Nurse|Deactivated
 DOC016|Ayisha|abcd|Doctor|Deactivated
+PAT016|Tasmia|abcd|Patient|Active
+PAT017|Yusuf|abcd|Patient|Active
+DOC017|Yunus|abcd|Doctor|Active
+NUR017|Bushra Issack|Reset123|Nurse|Deactivated

@@ -4,6 +4,7 @@
 #include "../headers/nurse.h"
 #include "../headers/structures.h"
 #include "../headers/inventory.h"
+#include "../headers/helper.h"
 
 #define MAX_NAME 50
 
@@ -17,6 +18,7 @@ void viewInventory(void);
 void searchInventory(void);
 void editInventory(void);
 void deleteInventory(void);
+void viewPatientReports(void);
 void chooseInventoryItemName(int categoryChoice, char itemName[]);
 
 void nurseMenu(void)
@@ -34,6 +36,7 @@ void nurseMenu(void)
         printf("4. Search Inventory\n");
         printf("5. Edit Inventory\n");
         printf("6. Delete Inventory\n");
+        printf("7. Reporting and Analytics\n");
         printf("0. Logout\n");
         printf("Enter your choice: ");
 
@@ -69,6 +72,10 @@ void nurseMenu(void)
         else if (choice == 6)
         {
             deleteInventory();
+        }
+        else if (choice == 7)
+        {
+            viewPatientReports();
         }
         else if (choice == 0)
         {
@@ -108,32 +115,21 @@ void viewDoctorSchedule()
 
 void chooseInventoryItemName(int categoryChoice, char itemName[])
 {
+    const char *itemNames[3][4] = {
+        {"Paracetamol", "Amoxicillin", "Ibuprofen", "Metformin"},
+        {"Syringes", "Gloves", "Gauze", "Masks"},
+        {"Wheelchair", "IV Stand", "Thermometer", "ECG Machine"}
+    };
     int itemChoice;
+    int i;
 
     while (1)
     {
         printf("\nChoose Item Name:\n");
 
-        if (categoryChoice == 1)
+        for (i = 0; i < 4; i++)
         {
-            printf("1. Paracetamol\n");
-            printf("2. Amoxicillin\n");
-            printf("3. Ibuprofen\n");
-            printf("4. Metformin\n");
-        }
-        else if (categoryChoice == 2)
-        {
-            printf("1. Syringes\n");
-            printf("2. Gloves\n");
-            printf("3. Gauze\n");
-            printf("4. Masks\n");
-        }
-        else
-        {
-            printf("1. Wheelchair\n");
-            printf("2. IV Stand\n");
-            printf("3. Thermometer\n");
-            printf("4. ECG Machine\n");
+            printf("%d. %s\n", i + 1, itemNames[categoryChoice - 1][i]);
         }
 
         printf("Enter choice: ");
@@ -147,43 +143,13 @@ void chooseInventoryItemName(int categoryChoice, char itemName[])
 
         while (getchar() != '\n');
 
-        if (categoryChoice == 1)
+        if (itemChoice < 1 || itemChoice > 4)
         {
-            if (itemChoice == 1) strcpy(itemName, "Paracetamol");
-            else if (itemChoice == 2) strcpy(itemName, "Amoxicillin");
-            else if (itemChoice == 3) strcpy(itemName, "Ibuprofen");
-            else if (itemChoice == 4) strcpy(itemName, "Metformin");
-            else
-            {
-                printf("Invalid choice. Please try again.\n");
-                continue;
-            }
-        }
-        else if (categoryChoice == 2)
-        {
-            if (itemChoice == 1) strcpy(itemName, "Syringes");
-            else if (itemChoice == 2) strcpy(itemName, "Gloves");
-            else if (itemChoice == 3) strcpy(itemName, "Gauze");
-            else if (itemChoice == 4) strcpy(itemName, "Masks");
-            else
-            {
-                printf("Invalid choice. Please try again.\n");
-                continue;
-            }
-        }
-        else
-        {
-            if (itemChoice == 1) strcpy(itemName, "Wheelchair");
-            else if (itemChoice == 2) strcpy(itemName, "IV Stand");
-            else if (itemChoice == 3) strcpy(itemName, "Thermometer");
-            else if (itemChoice == 4) strcpy(itemName, "ECG Machine");
-            else
-            {
-                printf("Invalid choice. Please try again.\n");
-                continue;
-            }
+            printf("Invalid choice. Please try again.\n");
+            continue;
         }
 
+        strcpy(itemName, itemNames[categoryChoice - 1][itemChoice - 1]);
         return;
     }
 }
@@ -192,24 +158,17 @@ void chooseInventoryItemName(int categoryChoice, char itemName[])
 void addInventory(void)
 {
     FILE *file;
+    FILE *temp;
     Inventory inv;
+    Inventory existing;
     int categoryChoice;
-
-    file = fopen("data/inventory.txt", "a");
-
-    if (file == NULL)
-    {
-        printf("Error opening inventory file.\n");
-        return;
-    }
+    int found = 0;
+    int nextNum;
+    char header[200];
 
     printf("\n=====================================\n");
     printf("            ADD INVENTORY            \n");
     printf("=====================================\n");
-
-    printf("Enter Item ID: ");
-    scanf("%9s", inv.item_id);
-    while (getchar() != '\n');
 
     categoryChoice = chooseInventoryCategory(inv.category);
     chooseInventoryItemName(categoryChoice, inv.item_name);
@@ -219,7 +178,6 @@ void addInventory(void)
     {
         printf("Invalid stock level.\n");
         while (getchar() != '\n');
-        fclose(file);
         return;
     }
 
@@ -228,16 +186,64 @@ void addInventory(void)
     if (inv.stock_level < 0)
     {
         printf("Invalid stock level.\n");
-        fclose(file);
         return;
     }
 
-    fprintf(file, "\n%s|%s|%s|%d",
-            inv.item_id, inv.item_name, inv.category, inv.stock_level);
+    file = fopen("data/inventory.txt", "r");
+    temp = fopen("data/temp.txt", "w");
+
+    if (file == NULL || temp == NULL)
+    {
+        printf("Error opening inventory file.\n");
+        if (file != NULL) fclose(file);
+        if (temp != NULL) fclose(temp);
+        return;
+    }
+
+    if (fgets(header, sizeof(header), file) != NULL)
+    {
+        fputs(header, temp);
+    }
+
+    while (fscanf(file, " %9[^|]|%49[^|]|%29[^|]|%d",
+                  existing.item_id, existing.item_name,
+                  existing.category, &existing.stock_level) == 4)
+    {
+        if (!found && strcmp(existing.item_name, inv.item_name) == 0)
+        {
+            existing.stock_level += inv.stock_level;
+            found = 1;
+        }
+
+        fprintf(temp, "%s|%s|%s|%d\n",
+                existing.item_id, existing.item_name,
+                existing.category, existing.stock_level);
+    }
+
+    if (!found)
+    {
+        nextNum = generateNextNumber("data/inventory.txt", "I");
+        sprintf(inv.item_id, "I%03d", nextNum);
+        printf("Generated Item ID: %s\n", inv.item_id);
+
+        fprintf(temp, "%s|%s|%s|%d\n",
+                inv.item_id, inv.item_name, inv.category, inv.stock_level);
+    }
 
     fclose(file);
+    fclose(temp);
 
-    printf("Inventory added successfully!\n");
+    remove("data/inventory.txt");
+    rename("data/temp.txt", "data/inventory.txt");
+
+    if (found)
+    {
+        printf("Item already exists. Stock updated successfully!\n");
+    }
+    else
+    {
+        printf("Inventory added successfully!\n");
+    }
 }
 
 
@@ -362,4 +368,55 @@ void deleteInventory(void)
         printf("Item deleted successfully!\n");
     else
         printf("Item not found.\n");
+}
+
+/* Reporting and Analytics (view and search) */
+void viewPatientReports(void)
+{
+    FILE *file;
+    char searchCriteria[50];
+    char recordID[15], patientID[15], doctorID[15], diagnosis[50], prescription[50], notes[100];
+    int found = 0;
+    char header[255];
+
+    file = fopen("data/ehr.txt", "r");
+
+    if (file == NULL)
+    {
+        printf("Error: EHR database (ehr.txt) not found.\n");
+        return;
+    }
+
+    printf("\n=====================================\n");
+    printf("    PATIENT REPORTING & ANALYTICS    \n");
+    printf("=====================================\n");
+    printf("Enter Patient ID or Diagnosis to search: ");
+    scanf(" %49[^\n]", searchCriteria);
+
+    printf("\n%-10s %-12s %-15s %-15s %-20s\n", "RecID", "PatID", "Diagnosis", "Prescription", "Notes");
+    printf("--------------------------------------------------------------------------------\n");
+
+    if (fgets(header, sizeof(header), file) == NULL)
+    {
+        fclose(file);
+        return;
+    }
+
+    while (fscanf(file, " %14[^|]|%14[^|]|%14[^|]|%49[^|]|%49[^|]|%99[^\n]",
+                  recordID, patientID, doctorID, diagnosis, prescription, notes) == 6)
+    {
+        if (strstr(patientID, searchCriteria) != NULL || strstr(diagnosis, searchCriteria) != NULL)
+        {
+            printf("%-10s %-12s %-15s %-15s %-20s\n",
+                   recordID, patientID, diagnosis, prescription, notes);
+            found = 1;
+        }
+    }
+
+    if (!found)
+    {
+        printf("No records found matching: %s\n", searchCriteria);
+    }
+
+    fclose(file);
 }

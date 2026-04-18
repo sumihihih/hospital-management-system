@@ -6,7 +6,6 @@ void viewInventory(void);
 void viewInventoryReport(char currentUserName[]);
 void searchInventory(void);
 void searchInventoryByID(void);
-void searchInventoryByName(void);
 void filterInventory(char currentUserName[]);
 void filterInventoryByName(char currentUserName[]);
 void filterInventoryByCategory(char currentUserName[]);

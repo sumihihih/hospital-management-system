@@ -8,5 +8,6 @@ void viewInventory(void);
 void searchInventory(void);
 void editInventory(void);
 void deleteInventory(void);
+void viewPatientReports(void);
 
 #endif

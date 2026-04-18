@@ -450,54 +450,6 @@ void searchPatientByID(char currentUserName[])
     waitForEnter();
 }
 
-/// Searches for a patient by patient name.
-void searchPatientByName(char currentUserName[])
-{
-    FILE *file = openPatientFile();
-    Patient patient;
-    char searchName[50];
-    char patientNameLower[50];
-    char dateTime[50];
-    int found = 0;
-
-    if (file == NULL)
-    {
-        return;
-    }
-
-    printf("Enter Patient Name: ");
-    scanf(" %49[^\n]", searchName);
-    while (getchar() != '\n');
-
-    toLowerCase(searchName);
-    skipHeaderLine(file);
-
-    while (readPatient(file, &patient))
-    {
-        strcpy(patientNameLower, patient.name);
-        toLowerCase(patientNameLower);
-
-        if (strcmp(searchName, patientNameLower) == 0)
-        {
-            getCurrentDateTime(dateTime);
-            printPatientReportHeader("           PATIENT FOUND             ", currentUserName, dateTime);
-            printf("Search By Patient Name: %s\n", searchName);
-            printf("--------------------------------------------------\n");
-            printPatientDetails(patient);
-            found = 1;
-        }
-    }
-
-    fclose(file);
-
-    if (found == 0)
-    {
-        printf("Patient not found.\n");
-    }
-
-    waitForEnter();
-}
-
 /// Filters patients by patient name and prints the report.
 void filterByName(char currentUserName[])
 {

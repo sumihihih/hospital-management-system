@@ -328,44 +328,6 @@ void searchInventoryByID(void)
     waitForInventoryEnter();
 }
 
-void searchInventoryByName(void)
-{
-    FILE *file = openInventoryFile();
-    Inventory inv;
-    char searchName[50];
-    int found = 0;
-
-    if (file == NULL)
-    {
-        return;
-    }
-
-    printf("\nEnter Item Name: ");
-    scanf(" %49[^\n]", searchName);
-    while (getchar() != '\n');
-
-    skipInventoryHeader(file);
-
-    while (readInventory(file, &inv))
-    {
-        if (isSameItemName(searchName, inv.item_name))
-        {
-            printInventoryDetails(inv);
-            found = 1;
-            break;
-        }
-    }
-
-    fclose(file);
-
-    if (found == 0)
-    {
-        printf("Item not found.\n");
-    }
-
-    waitForInventoryEnter();
-}
-
 void filterInventory(char currentUserName[])
 {
     int choice;

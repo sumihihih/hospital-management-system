@@ -2,7 +2,7 @@ DoctorID|Date|Time|AvailabilityStatus
 DOC001|2026-04-15|10:00|Available
 DOC001|2026-04-15|11:00|Booked
 DOC001|2026-04-15|12:00|Unavailable
-DOC002|2026-04-15|10:00|Available
+DOC002|2026-04-15|10:00|Booked
 DOC003|2026-04-16|09:00|Available
 DOC003|2026-04-16|10:00|Booked
 DOC004|2026-04-16|11:00|Available
